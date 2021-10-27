@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Dimensions } from "react-native";
+import { ActivityIndicator, Dimensions, Text, View } from "react-native";
 import Swiper from "react-native-swiper";
 import styled from "styled-components/native";
 import Slide from "../components/Slide";
@@ -23,7 +23,7 @@ const Movies: React.FC<NativeStackScreenProps<any, "Movies">> = () => {
   const getNowPlaying = async () => {
     const { results } = await (
       await fetch(
-        `https://api.themoviedb.org/3/movie/nowPlaying?api_key=${API_KEY}&language=en-US&page=1&region=KR`
+        `https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}&language=en-US&page=1&region=KR`
       )
     ).json();
     setNowPlaying(results);
@@ -43,8 +43,8 @@ const Movies: React.FC<NativeStackScreenProps<any, "Movies">> = () => {
         loop
         autoplay
         autoplayTimeout={3.5}
-        showsButtons={false}
-        showsPagination={false}
+        showsButtons={true}
+        showsPagination={true}
         containerStyle={{ width: "100%", height: SCREEN_HEIGHT / 4 }}
       >
         {nowPlaying.map((movie) => (
