@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import Swiper from "react-native-swiper";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import styled from "styled-components/native";
 import { moviesApi } from "../api";
 import HMedia from "../components/HMedia";
@@ -52,19 +52,25 @@ const HSeparator = styled.View`
   height: 20px;
 `;
 const Movies: React.FC<NativeStackScreenProps<any, "Movies">> = () => {
-  const [refreshing, setRefreshing] = useState(false);
-  const { isLoading: nowPlayingLoading, data: nowPlayingData } = useQuery(
-    "nowPlaying",
-    moviesApi.nowPlaying
-  );
-  const { isLoading: upcomingLoading, data: upcomingData } = useQuery(
-    "upcoming",
-    moviesApi.upcoming
-  );
-  const { isLoading: trendingLoading, data: trendingData } = useQuery(
-    "trending",
-    moviesApi.trending
-  );
+  const queryClient = useQueryClient();
+  const {
+    isLoading: nowPlayingLoading,
+    data: nowPlayingData,
+
+    isRefetching: isRefetchingNowPlaying,
+  } = useQuery(["movies", "nowPlaying"], moviesApi.nowPlaying);
+  const {
+    isLoading: upcomingLoading,
+    data: upcomingData,
+
+    isRefetching: isRefetchingUpcomnig,
+  } = useQuery(["movies", "upcoming"], moviesApi.upcoming);
+  const {
+    isLoading: trendingLoading,
+    data: trendingData,
+
+    isRefetching: isRefetchingTrending,
+  } = useQuery(["movies", "trending"], moviesApi.trending);
 
   const renderVMedia = ({ item }) => (
     <VMedia
@@ -81,9 +87,14 @@ const Movies: React.FC<NativeStackScreenProps<any, "Movies">> = () => {
       releaseDate={item.release_date}
     />
   );
-  const onRefresh = async () => {};
+  const onRefresh = async () => {
+    queryClient.refetchQueries(["movies"]);
+  };
   const movieKeyExtractor = (item) => item.id + "";
   const loading = nowPlayingLoading || upcomingLoading || trendingLoading;
+  const refreshing =
+    isRefetchingNowPlaying || isRefetchingUpcomnig || isRefetchingTrending;
+  console.log(refreshing);
   return loading ? (
     <Loader>
       <ActivityIndicator color="red" />
